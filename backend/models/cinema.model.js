@@ -12,13 +12,15 @@ const cinemaSchema = new Schema({
     },
     movies: [{
         type: Schema.Types.ObjectId,
-        ref: 'Movie'
+        ref: 'Movie',
+        default: []
     }],
-    hall: [{
+    halls: [{
         type: Schema.Types.ObjectId,
-        ref: 'Hall'
+        ref: 'Hall',
+        default: []
     }]
 
-})
+},  { timestamps: true });
 
 export const Cinema = mongoose.model('Cinema', cinemaSchema);
