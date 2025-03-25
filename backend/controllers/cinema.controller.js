@@ -2,7 +2,9 @@ import ApiError from "../models/ApiError.js";
 import ApiResponse from "../models/ApiResponse.js";
 import Cinema from "../models/cinema.model.js";
 import { Location } from "../models/location.model.js";
-const getCinemas = async (req, res) => {
+import asyncHandler from "../utils/asyncHandler.js";
+
+const getCinemas = asyncHandler(async (req, res) => {
     const cinemas = await Cinema.find();
     if (cinemas.length === 0) {
         throw new ApiError(404, "No cinemas found");
@@ -10,11 +12,15 @@ const getCinemas = async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, cinemas, "Cinemas fetched successfully")
     );
-}
-const createCinema = async (req, res) => {
+})
+const createCinema = asyncHandler(async (req, res) => {
     const {name, location, movies = [], hall = []} = req.body;
     if(!name || !location){
         throw new ApiError(400, "Name and location are required");
+    }
+    const locationExists = await Location.findById(location);
+    if(!locationExists){
+        throw new ApiError(404, "Location not found");
     }
     const cinema = new Cinema({
         name,
@@ -32,9 +38,9 @@ const createCinema = async (req, res) => {
     return res.status(201).json(
         new ApiResponse(201,cinema, "Cinema created successfully")
     );
-}
+})
 
-const deleteCinema = async (req, res) => {
+const deleteCinema = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const cinema = await Cinema.findById(id);
     if (!cinema) {
@@ -50,9 +56,9 @@ const deleteCinema = async (req, res) => {
     return res.status(200).json(
         new ApiResponse(200, {}, "Cinema deleted successfully")
     );
-}
+})
 
-const updateCinema = async (req, res) => {
+const updateCinema = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const updatedCinema = await Cinema.findByIdAndUpdate(id, req.body, {new: true});
     if (!updatedCinema) {
@@ -63,7 +69,7 @@ const updateCinema = async (req, res) => {
         new ApiResponse(200, updatedCinema, "Cinema updated successfully")
     );
 
-}
+})
 
 export{
     getCinemas,

@@ -1,3 +1,5 @@
+// like gurgaon, delhi, each place with many cinemas 
+
 import mongoose, { Schema } from 'mongoose';
 
 const locationSchema = new Schema({

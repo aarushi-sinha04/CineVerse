@@ -1,3 +1,6 @@
+// hall number in the mall like screen 1
+
+
 import mongoose, { Schema } from "mongoose";
 
 const hallSchema = new Schema({

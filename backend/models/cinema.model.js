@@ -1,3 +1,5 @@
+// like pvr, inox, royal cinema 
+
 import mongoose, { Schema } from "mongoose";
 
 const cinemaSchema = new Schema({

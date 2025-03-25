@@ -1,3 +1,5 @@
+// movie name
+
 import mongoose, { Schema } from "mongoose";
 
 const movieSchema = new Schema({
