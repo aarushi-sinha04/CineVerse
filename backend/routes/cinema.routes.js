@@ -3,9 +3,10 @@ import { createCinema, deleteCinema, getCinemas, updateCinema } from '../control
 
 const router = Router();
 
-router.route("/").get(getCinemas);
-router.route("/create-cinema").post(createCinema);
-router.route("/update-cinema/:id").patch(updateCinema);
-router.route("/delete-cinema/:id").delete(deleteCinema);
+router.route("/cinemas").post(createCinema); 
+router.route("/cinemas/:id")
+.patch(updateCinema)
+.get(getCinemas)
+.delete(deleteCinema);
 
 export default router;

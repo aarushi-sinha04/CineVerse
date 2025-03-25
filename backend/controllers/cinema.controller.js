@@ -5,10 +5,23 @@ import { Location } from "../models/location.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 const getCinemas = asyncHandler(async (req, res) => {
-    const cinemas = await Cinema.find();
-    if (cinemas.length === 0) {
-        throw new ApiError(404, "No cinemas found");
+    const id = req.params.id;
+    let cinemas;
+    if(id){
+        cinemas = await Cinema.findById(id);
+        if (!cinemas) {
+            throw new ApiError(404, "Cinema not found");
+        }
     }
+    else{
+        cinemas = await Cinema.find();
+        if (cinemas.length === 0) {
+            throw new ApiError(404, "No cinemas found");
+        }
+
+    }
+    
+    
     return res.status(200).json(
         new ApiResponse(200, cinemas, "Cinemas fetched successfully")
     );
