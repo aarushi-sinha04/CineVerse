@@ -1,34 +1,61 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Header() {
     return (
-        <header className="w-full sticky top-0 z-50 ">
-            <div className=' bg-red-950 p-4  flex items-center justify-between '>
-            <div className='text-gray-100 font-bold text-2xl  '>
-                CineVerse
-            </div>
-            <div className='absolute left-1/2 transform -translate-x-1/2 flex space-x-10 text-xl text-gray-100'>
-                <NavLink to="/" 
-                className={({isActive}) => `'hover:text-gray-400' ${isActive? "text-gray-400 font-bold": ''}` }
-                >Home</NavLink>
+        <header className="w-full sticky top-0 z-50 bg-black/30 shadow-md">
+            <div className="p-4 flex items-center justify-between max-w-6xl mx-auto">
                 
-                 <NavLink 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    alert('Please enter city below')}} 
-                  to="/weather"
-                  className={({ isActive }) => `hover:text-gray-400 ${isActive ? "text-gray-400 font-bold" : ""}`}>
-                  Weather
-              </NavLink>
-
+                {/* Logo */}
+                <div className="text-gray-100 font-bold text-3xl tracking-wide">
+                    Cine<span className="text-[#d90101]">Verse</span>
                 </div>
-            
+                
+                {/* Navigation Links */}
+                <nav className="hidden md:flex space-x-8 text-lg text-gray-100">
+                    <NavLink 
+                        to="/" 
+                        className={({ isActive }) => 
+                            `hover:text-gray-400 transition ${isActive ? "text-gray-400 font-semibold" : ""}`
+                        }>
+                        Home
+                    </NavLink>
+                    
+                    <NavLink 
+                        to="/movie" 
+                        className={({ isActive }) => 
+                            `hover:text-gray-400 transition ${isActive ? "text-gray-400 font-semibold" : ""}`
+                        }>
+                        Movies
+                    </NavLink>
+
+                    <NavLink 
+                        to="/cinema" 
+                        className={({ isActive }) => 
+                            `hover:text-gray-400 transition ${isActive ? "text-gray-400 font-semibold" : ""}`
+                        }>
+                        Cinema
+                    </NavLink>
+
+                    <NavLink 
+                        to="/my-bookings" 
+                        className={({ isActive }) => 
+                            `hover:text-gray-400 transition ${isActive ? "text-gray-400 font-semibold" : ""}`
+                        }>
+                        My Bookings
+                    </NavLink>
+                </nav>
+
+                {/* Mobile Menu Button (Optional) */}
+                <button className="md:hidden text-gray-100 focus:outline-none">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" 
+                        viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
             </div>
-
-
         </header>
-    )
+    );
 }
 
 export default Header;
