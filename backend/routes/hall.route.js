@@ -1,6 +1,6 @@
 import {Router} from 'express';
 
-import { createHall, deleteHall, getHalls, updateHall } from '../controllers/hall.controller';
+import { createHall, deleteHall, getHalls, updateHall } from '../controllers/hall.controller.js';
 
 const router = Router();
 

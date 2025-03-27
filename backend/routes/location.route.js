@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createLocation, deleteLocation, getLocations, updateLocation } from '../controllers/location.controller';
+import { createLocation, deleteLocation, getLocations, updateLocation } from '../controllers/location.controller.js';
 
 const router = Router();
 

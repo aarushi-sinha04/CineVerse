@@ -3,18 +3,21 @@ import mongoose, { Schema } from 'mongoose';
 const showtimeSchema = new Schema({
     movie: {
         type: Schema.Types.ObjectId,
-        ref: 'Movie'
+        ref: 'Movie',
+        required: true
     },
     hall: {
         type: Schema.Types.ObjectId,
-        ref: 'Hall'
+        ref: 'Hall',
+        required: true
     },
     time: {
         type: String,
         required: true
+        
     },
     date: {
-        type: String,
+        type: Date,
         required: true
     },
     price: {
@@ -26,6 +29,6 @@ const showtimeSchema = new Schema({
         required: true
     } 
 
-})
+});
 
 export const Showtime = mongoose.model('Showtime', showtimeSchema);
