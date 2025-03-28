@@ -1,13 +1,19 @@
-import ApiError from "../models/ApiError.js";
-import ApiResponse from "../models/ApiResponse.js";
-import { Cinema, Hall } from "../models/cinema.model.js";
-import Location from "../models/location.model.js";
+import {ApiError }from "../utils/ApiError.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
+import { Cinema} from "../models/cinema.model.js";
+import {Hall} from "../models/hall.model.js";
+import {Location} from "../models/location.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
+
 
 const getLocations = asyncHandler(async (req, res) => {
     const id = req.params.id;
     let locations;
     if(id){
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new ApiError(400, "Invalid location ID");
+        }
         locations = await Location.findById(id);
         if (!locations) {
             throw new ApiError(404, "location not found");
@@ -26,8 +32,8 @@ const getLocations = asyncHandler(async (req, res) => {
 })
 
 const createLocation = asyncHandler(async(req, res) => {
-    const {location, cinemas = []} = req.body;
-    if(!location){
+    const {name, cinemas = []} = req.body;
+    if(!name){
         throw new ApiError(400, "Location is required");
     }
     if(cinemas.length>0){
@@ -38,7 +44,7 @@ const createLocation = asyncHandler(async(req, res) => {
     }
 
     const locationnew = new Location({
-        location,
+        name,
         cinemas
     });
     await locationnew.save();

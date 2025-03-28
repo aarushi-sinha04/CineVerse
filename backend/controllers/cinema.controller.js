@@ -1,8 +1,9 @@
-import ApiError from "../models/ApiError.js";
-import ApiResponse from "../models/ApiResponse.js";
-import Cinema from "../models/cinema.model.js";
+import {ApiError }from "../utils/ApiError.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
+import {Cinema} from "../models/cinema.model.js";
 import { Location } from "../models/location.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
 
 const getCinemas = asyncHandler(async (req, res) => {
     const id = req.params.id;

@@ -1,5 +1,4 @@
 import mongoose, {Schema} from "mongoose";
-import { Showtime } from "./showtime.model";
 
 const bookingSchema = new Schema({
     userID: {

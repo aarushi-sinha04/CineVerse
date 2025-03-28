@@ -1,11 +1,13 @@
-import ApiError from "../models/ApiError.js";
-import ApiResponse from "../models/ApiResponse.js";
+import {ApiError }from "../utils/ApiError.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
 import { Cinema } from "../models/cinema.model.js";
 import { Movie } from "../models/movie.model.js";
 import { Showtime } from "../models/showtime.model.js";
 import { Location } from "../models/location.model.js";
 import { Hall } from "../models/hall.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
+
 
 const getMovies = asyncHandler(async (req, res) => {
     const {id} = req.params;
