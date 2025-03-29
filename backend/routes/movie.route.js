@@ -3,8 +3,8 @@ import { createMovie, deleteMovie, getMovies, updateMovie } from '../controllers
 
 const router = Router();
 
-router.route("/movies").post(createMovie); 
-router.route("/movies/:id")
+router.route("/").post(createMovie).get(getMovies); 
+router.route("/:id")
 .patch(updateMovie)
 .get(getMovies)
 .delete(deleteMovie);

@@ -4,6 +4,8 @@ import locationRoutes from "./routes/location.route.js";
 import cinemaRoutes from "./routes/cinema.route.js";
 import hallRoutes from "./routes/hall.route.js";
 import bookingRoutes from "./routes/booking.route.js";
+import showtimeRoutes from "./routes/showtime.route.js";
+import movieRoutes from "./routes/movie.route.js";
 
 const app = express();
 
@@ -21,5 +23,7 @@ app.use("/api/locations", locationRoutes);
 app.use("/api/cinemas", cinemaRoutes);
 app.use("/api/halls", hallRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/showtimes", showtimeRoutes);
+app.use("/api/movies", movieRoutes);
 
 export default app;

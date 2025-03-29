@@ -1,121 +1,71 @@
-import {ApiError }from "../utils/ApiError.js";
-import {ApiResponse} from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { Booking } from "../models/booking.model.js";
-import { User } from "../models/user.model.js";
+import { Showtime } from "../models/showtime.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
-
 const getBooking = asyncHandler(async (req, res) => {
-    const {id} = req.params;
-    let booking;
-    if(id){
-        booking = await Booking.findById(id)
-            .populate("userID", "username name")
-            .populate("movie", "title")
-            .populate("cinema", "name location")
-            .populate("hall", "name")
-            .populate("showtime", "time date price");
+    const { id } = req.params;
+    let bookingQuery = Booking.find();
 
-        if (!booking) {
-            throw new ApiError(404, "Booking not found");
-        }
-    }
-    else{
-        booking = await Booking.find()
-        .populate("userID", "username name")
-        .populate("movie", "title")
-        .populate("cinema", "name location")
-        .populate("hall", "name")
-        .populate("showtime", "time date price");
-
-        if (booking.length === 0) {
-            throw new ApiError(404, "No bookings found");
-        }
-    }
-    return res.status(200).json(
-        new ApiResponse(200, booking, "Bookings fetched successfully")
-    );
-})
-
-const createBooking = asyncHandler(async (req, res) => {
-    const {userID, movie, cinema, hall, showtime, seats} = req.body;
-    if(!userID || !movie || !cinema || !hall || !showtime || !seats){
-        throw new ApiError(400, "All fields are required");
-    }
-    const userExists = await User.findById(userID);
-    if(!userExists){
-        throw new ApiError(404, "User not found");
-    }
-    const movieExists = await Movie.findById(movie);
-    if (!movieExists) {
-        throw new ApiError(404, "Movie not found");
+    if (id) {
+        bookingQuery = bookingQuery.findById(id);
     }
 
-    const cinemaExists = await Cinema.findById(cinema);
-    if (!cinemaExists) {
-        throw new ApiError(404, "Cinema not found");
-    }
-
-    const hallExists = await Hall.findById(hall);
-    if (!hallExists) {
-        throw new ApiError(404, "Hall not found");
-    }
-
-    const showtimeExists = await Showtime.findById(showtime);
-    if (!showtimeExists) {
-        throw new ApiError(404, "Showtime not found");
-    }
-
-    const booking = new Booking({
-        userID,
-        movie,
-        cinema,
-        hall,
-        showtime,
-        seats
+    bookingQuery = bookingQuery.populate({
+        path: "showtime",
+        populate: [
+            { path: "movie", select: "title" },
+            { path: "hall", populate: { path: "cinema", select: "name location" } }
+        ]
     });
 
+    const booking = await bookingQuery;
+
+    if (!booking || (Array.isArray(booking) && booking.length === 0)) {
+        throw new ApiError(404, id ? "Booking not found" : "No bookings found");
+    }
+
+    console.log("Populated Booking Data:", booking); // Debugging
+
+    return res.status(200).json(new ApiResponse(200, booking, "Bookings fetched successfully"));
+});
+
+
+const createBooking = asyncHandler(async (req, res) => {
+    const { showtime, seats } = req.body;
+    if (!showtime || !seats) throw new ApiError(400, "Showtime and seats are required");
+
+    const showtimeExists = await Showtime.findById(showtime);
+    if (!showtimeExists) throw new ApiError(404, "Showtime not found");
+
+    const { availableSeats, bookedSeats } = showtimeExists;
+    if (!seats.every(seat => availableSeats.includes(seat))) {
+        throw new ApiError(400, "One or more seats are not available");
+    }
+
+    const updatedAvailableSeats = availableSeats.filter(seat => !seats.includes(seat));
+    const updatedBookedSeats = [...bookedSeats, ...seats];
+
+    await Showtime.findByIdAndUpdate(showtime, {
+        availableSeats: updatedAvailableSeats,
+        bookedSeats: updatedBookedSeats
+    }, { new: true });
+
+    const booking = new Booking({ showtime, seats });
     await booking.save();
 
-    await User.findByIdAndUpdate(
-        userID,
-        { $push: {bookings: booking._id}},
-        {new: true}
-    );
+    return res.status(201).json(new ApiResponse(201, booking, "Booking created successfully"));
+});
 
-
-
-    return res.status(201).json(
-        new ApiResponse(201, booking, "Booking created successfully")
-    );
-})
-
-const deleteBooking = asyncHandler(async (req, res) => {  
-    const {id} = req.params;
+const deleteBooking = asyncHandler(async (req, res) => {
+    const { id } = req.params;
     const booking = await Booking.findById(id);
-    if(!booking){
-        throw new ApiError(404, "Booking not found");
-    }
+    if (!booking) throw new ApiError(404, "Booking not found");
 
     await Booking.findByIdAndDelete(id);
+    return res.status(200).json(new ApiResponse(200, {}, "Booking deleted successfully"));
+});
 
-    const user = await User.findById(booking.userID);
-    if (user) {
-        await User.findByIdAndUpdate(
-            booking.userID,
-            { $pull: { bookings: id } }
-        );
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, {}, "Booking deleted successfully")
-    );
-    
-})
-
-export { 
-    getBooking,
-    createBooking,
-    deleteBooking
-};
+export { getBooking, createBooking, deleteBooking };

@@ -1,9 +1,8 @@
 import {ApiError }from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
-import { Cinema } from "../models/cinema.model.js";
 import { Movie } from "../models/movie.model.js";
 import { Showtime } from "../models/showtime.model.js";
-import { Location } from "../models/location.model.js";
+
 import { Hall } from "../models/hall.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
@@ -32,38 +31,33 @@ const getMovies = asyncHandler(async (req, res) => {
     );
 })
 const createMovie = asyncHandler(async (req, res) => {
-    const {name, duration, genre, description, location, hall, cinema, showtime, poster} = req.body;
-    if(!name || !cinema || !duration || !genre || !description || !location || !hall || !showtime || !poster){
+    const {name, duration, genre, description, hall,showtime = [], poster} = req.body;
+    if(!name || !duration || !genre || !description || !hall  || !poster){
         throw new ApiError(400, "all information is required");
     }
-    const cinemaExists = await Cinema.findById(cinema);
-    if(!cinemaExists){
-        throw new ApiError(404, "cinema not found");
+    const existingMovie = await Movie.findOne({ name });
+    if (existingMovie) {
+        throw new ApiError(400, "Movie already exists with this name");
+    }
+    const hallExists = await Hall.findById(hall);
+    if(!hallExists){
+        throw new ApiError(404, "hall not found");
     }
     const movie = new Movie({
         name,
-        cinema,
-        showtime,
-        location,
-        hall,
-        poster,
+        duration,
         genre,
         description,
-        duration
+        hall,
+        showtime,
+        poster
+        
+        
+        
     });
     await movie.save();
-    await Cinema.findByIdAndUpdate(
-        cinema,
-        { $push: {movies: movie._id}},
-        {new: true}
+  
     
-    )
-    await Location.findByIdAndUpdate(
-        location,
-        { $push: {movies: movie._id}},
-        {new: true}
-    
-    )
     await Hall.findByIdAndUpdate(
         hall,
         { $push: {movies: movie._id}},
@@ -88,14 +82,8 @@ const deleteMovie = asyncHandler(async (req, res) => {
     }
     await movie.deleteOne();
 
-    await Cinema.updateMany(
-        { Movies: id },
-        { $pull: {movies: id}}
-    );
-    await Location.updateMany(
-        { Movies: id },
-        { $pull: {movies: id}}
-    );
+   
+    
     await Hall.updateMany(  
         { Movies: id },
         { $pull: {movies: id}}

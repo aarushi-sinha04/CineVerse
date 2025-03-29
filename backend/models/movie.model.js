@@ -20,22 +20,14 @@ const movieSchema = new Schema({
         type: String,
         required: true
     },
-    location: {
-        type: Schema.Types.ObjectId,
-        ref: 'Location'
-    },
-    cinema: {
-        type: Schema.Types.ObjectId,
-        ref: 'Cinema'
-    },
-    Hall: {
+    hall: {
         type: Schema.Types.ObjectId,
         ref: 'Hall'
     },
-    showtime: {
+    showtimes: [{
         type: Schema.Types.ObjectId,
         ref: 'Showtime'
-    },
+    }],
     poster: {
         type: String,
         required: true

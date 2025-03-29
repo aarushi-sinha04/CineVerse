@@ -29,8 +29,8 @@ const getHalls = asyncHandler(async (req, res) => {
     );
 })
 const createHall = asyncHandler(async (req, res) => {
-    const {screenNumber, cinema, showtime = [], totalSeats} = req.body;
-    if(!screenNumber || !cinema || !totalSeats){
+    const {screenNumber, cinema, showtime = [], totalseats} = req.body;
+    if(!screenNumber || !cinema || !totalseats){
         throw new ApiError(400, "screenNumber and cinema are required");
     }
     const cinemaExists = await Cinema.findById(cinema);
@@ -41,7 +41,7 @@ const createHall = asyncHandler(async (req, res) => {
         screenNumber,
         cinema,
         showtime,
-        totalSeats
+        totalseats
     });
     await hall.save();
     await Cinema.findByIdAndUpdate(

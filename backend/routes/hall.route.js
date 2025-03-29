@@ -4,8 +4,8 @@ import { createHall, deleteHall, getHalls, updateHall } from '../controllers/hal
 
 const router = Router();
 
-router.route("/halls").post(createHall); 
-router.route("/halls/:id")
+router.route("/").post(createHall).get(getHalls); 
+router.route("/:id")
 .patch(updateHall)
 .get(getHalls)
 .delete(deleteHall);

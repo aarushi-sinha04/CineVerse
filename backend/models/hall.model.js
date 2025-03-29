@@ -13,7 +13,7 @@ const hallSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Cinema'
     },
-    showtime: [{
+    showtimes: [{
         type: Schema.Types.ObjectId,
         ref: 'Showtime'
     }],

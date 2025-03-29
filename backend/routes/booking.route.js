@@ -4,8 +4,8 @@ import { createBooking, deleteBooking, getBooking } from '../controllers/booking
 
 const router = Router();
 
-router.route("/booking").post(createBooking); 
-router.route("/booking/:id")
+router.route("/").post(createBooking).get(getBooking); 
+router.route("/:id")
 .get(getBooking)
 .delete(deleteBooking);
 
