@@ -28,7 +28,15 @@ const movieSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Showtime'
     }],
-    poster: {
+    verticalPoster: {
+        type: String,
+        required: true
+    },
+    horizontalPoster: {
+        type: String,
+        required: true
+    },
+    trailer: {
         type: String,
         required: true
     }

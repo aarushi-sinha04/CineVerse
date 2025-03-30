@@ -28,6 +28,7 @@ const getHalls = asyncHandler(async (req, res) => {
         new ApiResponse(200, halls, "halls fetched successfully")
     );
 })
+
 const createHall = asyncHandler(async (req, res) => {
     const {screenNumber, cinema, showtime = [], totalseats} = req.body;
     if(!screenNumber || !cinema || !totalseats){

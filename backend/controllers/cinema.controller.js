@@ -27,6 +27,7 @@ const getCinemas = asyncHandler(async (req, res) => {
         new ApiResponse(200, cinemas, "Cinemas fetched successfully")
     );
 })
+
 const createCinema = asyncHandler(async (req, res) => {
     const {name, location, movies = [], hall = []} = req.body;
     if(!name || !location){

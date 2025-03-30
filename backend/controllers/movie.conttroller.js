@@ -2,9 +2,9 @@ import {ApiError }from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import { Movie } from "../models/movie.model.js";
 import { Showtime } from "../models/showtime.model.js";
-
 import { Hall } from "../models/hall.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import mongoose from "mongoose";
 
 
@@ -30,9 +30,10 @@ const getMovies = asyncHandler(async (req, res) => {
         new ApiResponse(200, movies, "Movies fetched successfully")
     );
 })
+
 const createMovie = asyncHandler(async (req, res) => {
-    const {name, duration, genre, description, hall,showtime = [], poster} = req.body;
-    if(!name || !duration || !genre || !description || !hall  || !poster){
+    const {name, duration, genre, description, hall,showtime = [], verticalPoster, horizontalPoster, trailer} = req.body;
+    if(!name || !duration || !genre || !description || !hall  || !verticalPoster|| !horizontalPoster || !trailer){
         throw new ApiError(400, "all information is required");
     }
     const existingMovie = await Movie.findOne({ name });
@@ -43,6 +44,9 @@ const createMovie = asyncHandler(async (req, res) => {
     if(!hallExists){
         throw new ApiError(404, "hall not found");
     }
+
+    
+
     const movie = new Movie({
         name,
         duration,
@@ -50,9 +54,9 @@ const createMovie = asyncHandler(async (req, res) => {
         description,
         hall,
         showtime,
-        poster
-        
-        
+        verticalPoster,
+        horizontalPoster,
+        trailer
         
     });
     await movie.save();

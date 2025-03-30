@@ -3,8 +3,10 @@ import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "./Header";
 
-function Home() {
+
+const Landing = () => {
     return (
+        
         <div className="relative h-screen w-full flex flex-col items-center justify-center text-gray-100 overflow-hidden">
             <Header />
 
@@ -77,7 +79,7 @@ function Home() {
                     transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
                 >
                     <NavLink 
-                        to="/movie" 
+                        to="/all-movies" 
                         className="px-6 py-3 text-lg font-medium text-gray-200 bg-[#870000] rounded-lg hover:bg-[#610000] hover:text-gray-300 transition-all duration-300 shadow-md"
                     >
                         Explore Movies
@@ -88,4 +90,5 @@ function Home() {
     );
 }
 
-export default Home;
+export default Landing;
+

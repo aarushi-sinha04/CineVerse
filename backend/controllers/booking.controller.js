@@ -31,7 +31,6 @@ const getBooking = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, booking, "Bookings fetched successfully"));
 });
 
-
 const createBooking = asyncHandler(async (req, res) => {
     const { showtime, seats } = req.body;
     if (!showtime || !seats || seats.length === 0) {
@@ -58,7 +57,6 @@ const createBooking = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, booking, "Booking created successfully"));
 });
-
 
 const deleteBooking = asyncHandler(async (req, res) => {
     const { id } = req.params;
