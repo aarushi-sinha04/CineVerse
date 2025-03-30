@@ -4,18 +4,19 @@ import { Showtime } from "../models/showtime.model.js";
 import { Movie } from "../models/movie.model.js";
 import { Hall } from "../models/hall.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import { Booking } from "../models/booking.model.js";
 
 const getShowtime = asyncHandler(async (req, res) => {
     const { id } = req.params;
     let showtime;
 
     if (id) {
-        showtime = await Showtime.findById(id).populate("movie hall");
+        showtime = await Showtime.findById(id);
         if (!showtime) {
             throw new ApiError(404, "Showtime not found");
         }
     } else {
-        showtime = await Showtime.find().populate("movie hall");
+        showtime = await Showtime.find();
         if (showtime.length === 0) {
             throw new ApiError(404, "No showtimes found");
         }
@@ -25,7 +26,7 @@ const getShowtime = asyncHandler(async (req, res) => {
 });
 
 const createShowtime = asyncHandler(async (req, res) => {
-    const { movie, hall, startTime, endTime, date, price, availableSeats, bookedSeats = [] } = req.body;
+    const { movie, hall, startTime, endTime, date, price, availableSeats } = req.body;
 
     if (!movie || !hall || !startTime || !date || !price || !availableSeats || !Array.isArray(availableSeats)) {
         throw new ApiError(400, "All fields are required, and availableSeats must be an array.");
@@ -51,7 +52,7 @@ const createShowtime = asyncHandler(async (req, res) => {
         date,
         price,
         availableSeats,
-        bookedSeats
+        bookedSeats : []
     });
 
     await newShowtime.save();
@@ -91,6 +92,8 @@ const deleteShowtime = asyncHandler(async (req, res) => {
         { $pull: { showtimes: id } },
         { new: true }
     );
+
+    await Booking.deleteMany({ showtime: id });
 
     // Delete the showtime
     await showtime.deleteOne();

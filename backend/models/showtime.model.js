@@ -5,7 +5,7 @@ const showtimeSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Movie',
         required: true,
-        index: true // Improves query performance
+        index: true
     },
     hall: {
         type: Schema.Types.ObjectId,
@@ -13,11 +13,11 @@ const showtimeSchema = new Schema({
         required: true,
         index: true
     },
-    startTime: { // More descriptive than just "time"
+    startTime: { // Use Date if doing time calculations
         type: String,
         required: true
     },
-    endTime: { // Useful for scheduling
+    endTime: {
         type: String
     },
     date: {
@@ -29,18 +29,12 @@ const showtimeSchema = new Schema({
         required: true
     },
     availableSeats: { 
-        type: [Number], // Store available seat numbers
+        type: [Number], 
         required: true
     },
     bookedSeats: { 
         type: [Number], 
-        default: [],
-        validate: {
-            validator: function (value) {
-                return value.length <= this.availableSeats.length;
-            },
-            message: "Booked seats cannot exceed available seats."
-        }
+        default: []
     }
 });
 

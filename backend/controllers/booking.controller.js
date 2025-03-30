@@ -7,27 +7,26 @@ import mongoose from "mongoose";
 
 const getBooking = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    let bookingQuery = Booking.find();
+    let booking;
 
     if (id) {
-        bookingQuery = bookingQuery.findById(id);
+        booking = await Booking.findById(id).populate({
+            path: "showtime",
+            select: "movie hall"  // Populate movie and hall inside showtime
+        });
+        
+        if (!booking) {
+            throw new ApiError(404, "Booking not found");
+        }
+    }
+    else{
+        booking = await Booking.find();
+        if (booking.length === 0) {
+            throw new ApiError(404, "No bookings found");
+        }
     }
 
-    bookingQuery = bookingQuery.populate({
-        path: "showtime",
-        populate: [
-            { path: "movie", select: "title" },
-            { path: "hall", populate: { path: "cinema", select: "name location" } }
-        ]
-    });
-
-    const booking = await bookingQuery;
-
-    if (!booking || (Array.isArray(booking) && booking.length === 0)) {
-        throw new ApiError(404, id ? "Booking not found" : "No bookings found");
-    }
-
-    console.log("Populated Booking Data:", booking); // Debugging
+    
 
     return res.status(200).json(new ApiResponse(200, booking, "Bookings fetched successfully"));
 });
@@ -35,29 +34,31 @@ const getBooking = asyncHandler(async (req, res) => {
 
 const createBooking = asyncHandler(async (req, res) => {
     const { showtime, seats } = req.body;
-    if (!showtime || !seats) throw new ApiError(400, "Showtime and seats are required");
-
-    const showtimeExists = await Showtime.findById(showtime);
-    if (!showtimeExists) throw new ApiError(404, "Showtime not found");
-
-    const { availableSeats, bookedSeats } = showtimeExists;
-    if (!seats.every(seat => availableSeats.includes(seat))) {
-        throw new ApiError(400, "One or more seats are not available");
+    if (!showtime || !seats || seats.length === 0) {
+        throw new ApiError(400, "Showtime and at least one seat are required");
     }
 
-    const updatedAvailableSeats = availableSeats.filter(seat => !seats.includes(seat));
-    const updatedBookedSeats = [...bookedSeats, ...seats];
+    // Use atomic update to ensure seat availability before booking
+    const updatedShowtime = await Showtime.findOneAndUpdate(
+        { _id: showtime, availableSeats: { $all: seats } }, // Ensure all seats are available
+        { 
+            $pull: { availableSeats: { $in: seats } }, // Remove from available
+            $push: { bookedSeats: { $each: seats } }  // Add to booked
+        },
+        { new: true }
+    );
 
-    await Showtime.findByIdAndUpdate(showtime, {
-        availableSeats: updatedAvailableSeats,
-        bookedSeats: updatedBookedSeats
-    }, { new: true });
+    if (!updatedShowtime) {
+        throw new ApiError(400, "One or more seats were just booked by someone else");
+    }
 
+    // Create and save booking
     const booking = new Booking({ showtime, seats });
     await booking.save();
 
     return res.status(201).json(new ApiResponse(201, booking, "Booking created successfully"));
 });
+
 
 const deleteBooking = asyncHandler(async (req, res) => {
     const { id } = req.params;
