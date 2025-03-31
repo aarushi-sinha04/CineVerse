@@ -20,10 +20,6 @@ const movieSchema = new Schema({
         type: String,
         required: true
     },
-    hall: {
-        type: Schema.Types.ObjectId,
-        ref: 'Hall'
-    },
     showtimes: [{
         type: Schema.Types.ObjectId,
         ref: 'Showtime'

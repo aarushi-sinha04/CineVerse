@@ -8,8 +8,6 @@ import "slick-carousel/slick/slick-theme.css";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
-
-
 function AllMoviesPage() {
     const [movieData, setMovieData] = useState([]);
     const [loading, setLoading] = useState(true);

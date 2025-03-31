@@ -1,0 +1,194 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import Header from "./Header";
+
+function BookingPage() {
+    const { id } = useParams();
+    const [selectedDate, setSelectedDate] = useState("March 30");
+    const [selectedShowtime, setSelectedShowtime] = useState(null);
+    const [selectedhall, setSelectedhall] = useState(null);
+    const [movieData, setMovieData] = useState({});
+    useEffect(() => {
+
+        const fetchMovieData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8000/api/movies/${id}`);
+                const data = await response.json();  // Extract JSON data
+                setMovieData(data.data);
+                const sortedDates = Object.entries(
+                    data.data.showtimes.reduce((acc, showtime) => {
+                        const unformatteddate = showtime.date; 
+                        const date = new Date(unformatteddate).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
+                        if (!acc[date]) {
+                            acc[date] = [];
+                        }
+                        acc[date].push(showtime);
+                        return acc;
+                    }, {})
+                )
+                .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB)); // Sort dates
+
+                // Set the first date as the default selected date
+                if (sortedDates.length > 0) {
+                    setSelectedDate(sortedDates[0][0]);
+                }
+            } catch (error) {
+                console.error("Error fetching movie data:", error);
+            }
+        };
+
+        fetchMovieData();
+    }, [])
+
+    
+
+    const handleBooking = () => {
+        if (!selectedDate || !selectedShowtime || !selectedhall) return;
+        alert(`Booking confirmed for ${selectedhall} at ${selectedShowtime} on ${selectedDate}`);
+    };
+
+    return (
+        <div className="bg-black">
+        <Header />
+        <div className="relative w-full min-h-screen bg-black text-white overflow-hidden">
+            
+
+            {/* Background Animation Layer */}
+            <motion.div 
+                className="absolute inset-0 bg-gradient-to-b from-gray-900 via-black to-gray-950"
+                animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                style={{ backgroundSize: "200% 200%" }}
+            ></motion.div>
+
+            {/* Enhanced Red Glow - Moderately Bright */}
+            <motion.div 
+                className="absolute w-[400px] h-[400px] bg-red-600 opacity-35 rounded-full blur-[170px]"
+                initial={{ x: "-50%", y: "-50%" }}
+                animate={{ x: ["-30%", "25%", "-30%"], y: ["-20%", "15%", "-20%"] }}
+                transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            ></motion.div>
+
+            {/* More Visible Navy Blue Glow - Balanced Intensity */}
+            <motion.div 
+                className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-blue-700 opacity-30 rounded-full blur-[160px]"
+                initial={{ x: "50%", y: "50%" }}
+                animate={{ x: ["25%", "-30%", "25%"], y: ["15%", "-20%", "15%"] }}
+                transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+            ></motion.div>
+
+            {/* New Purple Glow for a Galactic Effect - Softer but Noticeable */}
+            <motion.div 
+                className="absolute top-16 left-1/2 w-[300px] h-[300px] bg-purple-600 opacity-25 rounded-full blur-[150px]"
+                initial={{ x: "-40%", y: "-30%" }}
+                animate={{ x: ["-20%", "20%", "-20%"], y: ["-10%", "15%", "-10%"] }}
+                transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+            ></motion.div>
+
+            <div className="max-w-4xl mx-auto p-6 relative z-10">
+                {/* Movie Info */}
+                <div className="flex gap-6">
+                    <img src={movieData.verticalPoster} alt={movieData.name} className="w-48 h-72 rounded-lg" />
+                    <div>
+                        <h1 className="text-4xl font-bold">{movieData.name}</h1>
+                        <p className="text-gray-400 mt-2">{movieData.genre} | {movieData.duration} min</p>
+                        <p className="text-yellow-500 mt-2">⭐ </p>
+                    </div>
+                </div>
+
+                {/* Date Selection */}
+                <h2 className="mt-6 text-2xl font-bold">Select Date</h2>
+                <div className="flex space-x-4 overflow-x-auto p-2">
+                    {/* Check if showtimes exists and is an array */}
+                    {movieData.showtimes && Array.isArray(movieData.showtimes) && Object.entries(
+                        movieData.showtimes.reduce((acc, showtime) => {
+                            const unformatteddate = showtime.date; 
+                            const date = new Date(unformatteddate).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
+                            if (!acc[date]) {
+                                acc[date] = [];
+                            }
+                            acc[date].push(showtime);
+                            return acc;
+                        }, {})
+                    )
+                    .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+                    .map(([date, showtimes]) => (
+                        <div key={date}>
+                            {/* Display buttons for each date */}
+                            <button
+                                onClick={() => setSelectedDate(date)} 
+                                className={`px-4 py-2 rounded-lg ${selectedDate === date ? "bg-red-600/60" : "bg-gray-800/50 hover:bg-gray-800"}`}
+                            >
+                                {date}
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                {/* hall & Showtime Selection */}
+                {selectedDate && (
+                    <>
+                        <h2 className="mt-6 text-2xl font-bold">Select Showtime</h2>
+                        <div className="space-y-6">
+                            {/* Group showtimes by cinema name */}
+                            {movieData.showtimes && Array.isArray(movieData.showtimes) && Object.entries(
+                                movieData.showtimes.reduce((acc, showtime) => {
+                                    const cinemaName = showtime.hall?.cinema?.name;
+                                    const showtimeDate = new Date(showtime.date).toLocaleDateString("en-US", { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                                    // Ensure showtime matches the selected date
+                                    if (showtimeDate === selectedDate) {
+                                        if (!acc[cinemaName]) {
+                                            acc[cinemaName] = [];
+                                        }
+                                        acc[cinemaName].push(showtime);
+                                    }
+                                    return acc;
+                                }, {})
+                            )
+                            .sort(([cinemaA], [cinemaB]) => cinemaA.localeCompare(cinemaB))
+                            .map(([cinemaName, showtimes]) => (
+                                <div key={cinemaName} className="p-4 bg-gray-900/60 rounded-lg">
+                                    <h3 className="text-xl font-bold text-gray-200">{cinemaName}</h3>
+                                    <div className="grid grid-cols-4 gap-4 mt-2">
+                                        {/* Display buttons for each showtime for this cinema */}
+                                        {showtimes
+                                        .sort((a, b) => new Date(`1970-01-01T${a.startTime}:00`).getTime() - new Date(`1970-01-01T${b.startTime}:00`).getTime())
+                                        .map(showtime => (
+                                            <button 
+                                                key={showtime._id} 
+                                                onClick={() => { 
+                                                    setSelectedShowtime(showtime.startTime); 
+                                                    setSelectedhall(showtime.hall?.cinema?.name); 
+                                                }} 
+                                                className={`p-2 rounded-lg ${selectedShowtime === showtime.startTime && selectedhall === showtime.hall.cinema.name ? "bg-red-600/60" : "bg-gray-800/50 hover:bg-gray-800"}`}
+                                            >
+                                                {showtime.startTime}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                
+                
+
+
+
+
+                
+
+
+                {/* Book Now Button */}
+                <button onClick={handleBooking} className="mt-6 w-full bg-red-600/60 py-3 rounded-lg text-white font-bold hover:bg-red-800/70">Book Now</button>
+            </div>
+        </div>
+        </div>
+    );
+}
+
+export default BookingPage;

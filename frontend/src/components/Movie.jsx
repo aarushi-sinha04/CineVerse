@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "./Header";
 import axios from "axios";
@@ -54,8 +54,9 @@ function MoviePage() {
                     {/* Extra Buttons */}
                 <div className="mt-6 flex space-x-4 items-center">
                     <a href={movieData.trailer} target="_blank" rel="noopener noreferrer" className="bg-[#ba1745]/90 py-3 px-6 rounded-md text-white/80 font-bold hover:bg-[#ba1745]/70">Watch Trailer</a>
-                    
+                    <NavLink to={`/booking-movie/${id}`}>
                     <button  className="w-40 bg-red-700/70 py-3 rounded-md text-white font-bold hover:bg-red-800/70 transition">Book Now</button>
+                    </NavLink>
                     
                 </div>
                 
