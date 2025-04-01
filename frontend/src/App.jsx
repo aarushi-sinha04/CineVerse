@@ -7,6 +7,7 @@ import MoviePage from './components/Movie.jsx';
 import Landing from './components/Landing.jsx';
 import AllmoviesPage from './components/Allmovies.jsx';
 import BookingPage from './components/movieBooking.jsx';
+import SeatLayout from './components/seatBooking.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,6 +16,7 @@ const router = createBrowserRouter(
       <Route path="/all-movies" element={<AllmoviesPage />} />
       <Route path="/movie/:id" element={<MoviePage />} /> {/* Dynamic Movie Route */}
       <Route path="/booking-movie/:id" element={<BookingPage />} /> 
+      <Route path="/seat-booking" element={<SeatLayout />} /> 
     </>
   )
 );
