@@ -1,0 +1,13 @@
+@keyframes floating {
+    0% {
+      transform: translateY(0px);
+    }
+    100% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  .animate-floating {
+    animation: floating infinite alternate ease-in-out;
+  }
+  
