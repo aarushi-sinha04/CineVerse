@@ -16,7 +16,7 @@ const router = createBrowserRouter(
       <Route path="/all-movies" element={<AllmoviesPage />} />
       <Route path="/movie/:id" element={<MoviePage />} /> {/* Dynamic Movie Route */}
       <Route path="/booking-movie/:id" element={<BookingPage />} /> 
-      <Route path="/seat-booking" element={<SeatLayout />} /> 
+      <Route path="/seat-booking/:id" element={<SeatLayout />} /> 
     </>
   )
 );

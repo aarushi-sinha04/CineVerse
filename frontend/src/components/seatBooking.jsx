@@ -1,32 +1,57 @@
 import React from "react"
-
-import { useState } from "react"
+import { useLocation, useParams } from "react-router-dom"
+import axios from "axios"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Glow from "./glow"
 import Header from "./Header"
 import { ChevronRight } from "lucide-react"
 
 const SeatLayout = () => {
+  const { id } = useParams()
+  const [movieData, setMovieData] = useState(null)
   const [selectedSeats, setSelectedSeats] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const location = useLocation()
+  const { selectedDate, selectedShowtime, selectedhall } = location.state || {}
+
+  useEffect(() => {
+    const fetchMovie = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/movies/${id}`)
+        setMovieData(response.data.data)
+      } catch (err) {
+        console.error("Error fetching movie:", err)
+        setError("Failed to fetch movie data.")
+      } finally {
+        setLoading(false)
+      }
+    };
+    fetchMovie()
+  }, [id]);
+  if (loading) return <div className="text-white text-center mt-10">Loading...</div>;
+  if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
+  if (!movieData) return <div className="text-white text-center mt-10">No movie found</div>;
 
   // Seat status: 0 = available, 1 = booked
   const seatLayout = {
     left: [
-      [0, 0, 1, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 1],
-      [1, 0, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 1],
-      [1, 0, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 1],
-      [1, 0, 0, 0],
-      [0, 0, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
     ],
     center: [
-      [0, 0, 0, 1, 0, 0],
-      [1, 0, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+      [1, 0, 0, 0, 0, 0],
       [0, 1, 0, 0, 1, 0],
       [0, 0, 0, 0, 0, 1],
       [1, 0, 0, 1, 0, 0],
@@ -75,8 +100,8 @@ const SeatLayout = () => {
         className="z-10 flex flex-col items-center justify-center h-full w-full max-w-5xl px-4 -mt-10"
       >
         <div className="mb-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-200 mt-10">Avengers: Endgame</h2>
-          <p className="text-lg text-gray-400">PVR Cinemas | March 30, 2025 | 7:30 PM</p>
+          <h2 className="text-3xl font-bold text-gray-200 mt-10">{movieData?.name}</h2>
+          <p className="text-lg text-gray-400">{selectedhall} | {selectedDate} | {selectedShowtime}</p>
         </div>
 
         <div className="w-full flex justify-between items-start mb-6">

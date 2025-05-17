@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import Header from "./Header";
 import Glow from "./glow";
@@ -46,7 +46,7 @@ function BookingPage() {
 
     const handleBooking = () => {
         if (!selectedDate || !selectedShowtime || !selectedhall) return;
-        alert(`Booking confirmed for ${selectedhall} at ${selectedShowtime} on ${selectedDate}`);
+        
     };
 
     return (
@@ -149,13 +149,15 @@ function BookingPage() {
                 
 
 
-
-
-                
-
-
                 {/* Book Now Button */}
-                <button onClick={handleBooking} className="mt-6 w-full bg-red-600/60 py-3 rounded-lg text-white font-bold hover:bg-red-800/70">Book Now</button>
+                <NavLink to={`/seat-booking/${id}`}
+                state={{ selectedDate, selectedShowtime, selectedhall }}
+                className="mt-6">
+                <button onClick={handleBooking}
+                
+                disabled={!selectedDate || !selectedShowtime}
+                 className={`mt-6 w-full bg-red-600/60 py-3 rounded-lg text-white font-bold hover:bg-red-800/70 ${ selectedDate && selectedShowtime ? "" : "opacity-50 cursor-not-allowed"}`}>Book Now</button>
+                </NavLink>
             </div>
         </div>
         </div>
