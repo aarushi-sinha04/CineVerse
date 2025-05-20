@@ -16,11 +16,7 @@ const hallSchema = new Schema({
     showtimes: [{
         type: Schema.Types.ObjectId,
         ref: 'Showtime'
-    }],
-    totalseats: {
-        type: Number,
-        required: true
-    }
+    }]
 
 })
 

@@ -7,17 +7,22 @@ const bookingSchema = new Schema({
     //     required: true
         
     // },
-    
     showtime: {
         type: Schema.Types.ObjectId,
         ref: 'Showtime',
         required: true
     },
     seats: [{
-        type: Number,
+        type: Schema.Types.ObjectId,
+        ref: 'Seat',
         required: true,
         min: 1
-    }]
+    }],
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
 }, { timestamps: true });
 
 export const Booking = mongoose.model('Booking', bookingSchema);

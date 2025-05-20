@@ -6,6 +6,7 @@ import hallRoutes from "./routes/hall.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import showtimeRoutes from "./routes/showtime.route.js";
 import movieRoutes from "./routes/movie.route.js";
+import userRoutes from "./routes/user.route.js";
 
 const app = express();
 
@@ -25,5 +26,7 @@ app.use("/api/halls", hallRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/showtimes", showtimeRoutes);
 app.use("/api/movies", movieRoutes);
+app.use("/api/user", userRoutes);
+
 
 export default app;

@@ -28,13 +28,9 @@ const showtimeSchema = new Schema({
         type: Number,
         required: true
     },
-    availableSeats: { 
-        type: [Number], 
+    availableSeats: {
+        type: Number,
         required: true
-    },
-    bookedSeats: { 
-        type: [Number], 
-        default: []
     }
 });
 

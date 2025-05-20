@@ -28,8 +28,8 @@ const getShowtime = asyncHandler(async (req, res) => {
 const createShowtime = asyncHandler(async (req, res) => {
     const { movie, hall, startTime, endTime, date, price, availableSeats } = req.body;
 
-    if (!movie || !hall || !startTime || !date || !price || !availableSeats || !Array.isArray(availableSeats)) {
-        throw new ApiError(400, "All fields are required, and availableSeats must be an array.");
+    if (!movie || !hall || !startTime || !date || !price || !availableSeats ) {
+        throw new ApiError(400, "All fields are required");
     }
 
     // Validate if the movie and hall exist
@@ -43,6 +43,7 @@ const createShowtime = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Hall not found");
     }
 
+
     // Create showtime
     const newShowtime = new Showtime({
         movie,
@@ -51,8 +52,7 @@ const createShowtime = asyncHandler(async (req, res) => {
         endTime,
         date,
         price,
-        availableSeats,
-        bookedSeats : []
+        availableSeats
     });
 
     await newShowtime.save();
@@ -103,13 +103,7 @@ const deleteShowtime = asyncHandler(async (req, res) => {
 
 const updateShowtime = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { availableSeats, bookedSeats } = req.body;
-
-    // Ensure bookedSeats doesn't exceed availableSeats
-    if (bookedSeats && availableSeats && bookedSeats.length > availableSeats.length) {
-        throw new ApiError(400, "Booked seats cannot exceed available seats.");
-    }
-
+    
     const updatedShowtime = await Showtime.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!updatedShowtime) {

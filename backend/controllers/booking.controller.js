@@ -2,6 +2,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Booking } from "../models/booking.model.js";
 import { Showtime } from "../models/showtime.model.js";
+import { Seat } from "../models/seats.model.js";
+import { User } from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
@@ -32,30 +34,46 @@ const getBooking = asyncHandler(async (req, res) => {
 });
 
 const createBooking = asyncHandler(async (req, res) => {
-    const { showtime, seats } = req.body;
-    if (!showtime || !seats || seats.length === 0) {
-        throw new ApiError(400, "Showtime and at least one seat are required");
+    const { showtime, seats, user } = req.body;
+    if (!showtime || !seats || !user || seats.length === 0) {
+        throw new ApiError(400, "Showtime, user and at least one seat are required");
     }
 
-    // Use atomic update to ensure seat availability before booking
-    const updatedShowtime = await Showtime.findOneAndUpdate(
-        { _id: showtime, availableSeats: { $all: seats } }, // Ensure all seats are available
-        { 
-            $pull: { availableSeats: { $in: seats } }, // Remove from available
-            $push: { bookedSeats: { $each: seats } }  // Add to booked
-        },
-        { new: true }
-    );
+    // to ensure atomicity, we will use transactions
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (!updatedShowtime) {
-        throw new ApiError(400, "One or more seats were just booked by someone else");
-    }
-
-    // Create and save booking
-    const booking = new Booking({ showtime, seats });
-    await booking.save();
-
-    return res.status(201).json(new ApiResponse(201, booking, "Booking created successfully"));
+    try {
+        // Step 1: Check availability (all seats must be isBooked: false)
+        // const availableSeatsCount = await Seat.countDocuments({
+        //   _id: { $in: seats },
+        //   showtime,
+        //   isBooked: false
+        // }).session(session);
+    
+        // if (availableSeatsCount !== seats.length) {
+        //   throw new ApiError(400, "One or more seats are already booked");
+        // }
+    
+        // Step 2: Mark seats as booked atomically
+        await Seat.updateMany(
+          { _id: { $in: seats }, showtime, isBooked: false },
+          { $set: { isBooked: true, user: user } }
+        ).session(session);
+    
+        // Step 3: Create booking record (assuming Booking model exists)
+        const booking = new Booking({ showtime, seats, user: user });
+        await booking.save({ session });
+    
+        await session.commitTransaction();
+        session.endSession();
+    
+        return res.status(201).json(new ApiResponse(201, booking, "Booking created successfully"));
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        throw error;
+      }
 });
 
 const deleteBooking = asyncHandler(async (req, res) => {
